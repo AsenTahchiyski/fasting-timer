@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { TabBar, type TabId } from './components/TabBar';
 import {
@@ -30,29 +30,26 @@ export function App() {
         <Onboarding initial={settings} />
       ) : (
         <>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={tab}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.22 }}
-            >
-              {tab === 'timer' && (
-                <TimerScreen
-                  settings={settings}
-                  active={active ?? undefined}
-                  last={last ?? undefined}
-                />
-              )}
-              {tab === 'history' && (
-                <HistoryScreen sessions={sessions} settings={settings} />
-              )}
-              {tab === 'settings' && (
-                <SettingsScreen sessions={sessions} settings={settings} />
-              )}
-            </motion.div>
-          </AnimatePresence>
+          <motion.div
+            key={tab}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.22 }}
+          >
+            {tab === 'timer' && (
+              <TimerScreen
+                settings={settings}
+                active={active ?? undefined}
+                last={last ?? undefined}
+              />
+            )}
+            {tab === 'history' && (
+              <HistoryScreen sessions={sessions} settings={settings} />
+            )}
+            {tab === 'settings' && (
+              <SettingsScreen sessions={sessions} settings={settings} />
+            )}
+          </motion.div>
           <TabBar active={tab} onSelect={setTab} />
         </>
       )}

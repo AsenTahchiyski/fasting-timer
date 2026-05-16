@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { Button } from '../components/Button';
 import { ColorSwatch } from '../components/ColorSwatch';
@@ -77,16 +77,14 @@ export function Onboarding({ initial }: Props) {
           </div>
         </div>
 
-        <div className="rounded-3xl border border-line bg-surface-2 p-6 shadow-sm min-h-[360px]">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={step}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.25 }}
-              className="grid gap-5"
-            >
+        <div className="rounded-3xl border border-line bg-surface-2 p-6 shadow-sm min-h-[360px] overflow-hidden">
+          <motion.div
+            key={step}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.25 }}
+            className="grid gap-5"
+          >
               {step === 0 && (
                 <>
                   <div>
@@ -226,8 +224,7 @@ export function Onboarding({ initial }: Props) {
                   </Field>
                 </>
               )}
-            </motion.div>
-          </AnimatePresence>
+          </motion.div>
         </div>
 
         <div className="mt-5 flex gap-2">
