@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { Button } from '../components/Button';
 import { ColorSwatch } from '../components/ColorSwatch';
 import { Field } from '../components/Field';
+import { LanguagePicker } from '../components/LanguagePicker';
 import { Modal } from '../components/Modal';
 import { Segmented } from '../components/Segmented';
 import { TimezonePicker } from '../components/TimezonePicker';
@@ -10,9 +11,11 @@ import type {
   ExportPayload,
   FastSession,
   HourFormat,
+  Language,
   Settings,
   ThemeMode
 } from '../db/types';
+import { useT } from '../lib/i18n';
 
 interface Props {
   settings: Settings;
@@ -20,6 +23,7 @@ interface Props {
 }
 
 export function SettingsScreen({ settings, sessions }: Props) {
+  const t = useT();
   const fileRef = useRef<HTMLInputElement>(null);
   const [importOpen, setImportOpen] = useState<{
     payload: ExportPayload;
@@ -51,7 +55,7 @@ export function SettingsScreen({ settings, sessions }: Props) {
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
-    flash('Exported');
+    flash(t('settings.toast.exported'));
   };
 
   const handleFile = async (file: File) => {
@@ -59,12 +63,12 @@ export function SettingsScreen({ settings, sessions }: Props) {
       const text = await file.text();
       const parsed = JSON.parse(text) as Partial<ExportPayload>;
       if (parsed.version !== 1 || !parsed.settings || !Array.isArray(parsed.sessions)) {
-        flash('Not a valid export file');
+        flash(t('settings.toast.invalid'));
         return;
       }
       setImportOpen({ payload: parsed as ExportPayload });
     } catch {
-      flash('Could not read that file');
+      flash(t('settings.toast.unreadable'));
     } finally {
       if (fileRef.current) fileRef.current.value = '';
     }
@@ -90,13 +94,17 @@ export function SettingsScreen({ settings, sessions }: Props) {
       }
     });
     setImportOpen(null);
-    flash(mode === 'replace' ? 'Imported (replaced)' : 'Imported (merged)');
+    flash(
+      mode === 'replace'
+        ? t('settings.toast.importedReplace')
+        : t('settings.toast.importedMerge')
+    );
   };
 
   const handleClearHistory = async () => {
     await db.sessions.clear();
     setClearOpen(false);
-    flash('History cleared');
+    flash(t('settings.toast.cleared'));
   };
 
   const flash = (msg: string) => {
@@ -104,18 +112,27 @@ export function SettingsScreen({ settings, sessions }: Props) {
     window.setTimeout(() => setToast(null), 2200);
   };
 
+  const importCount = importOpen?.payload.sessions.length ?? 0;
+
   return (
     <div className="app-shell">
       <div className="max-w-md mx-auto p-5 pt-6 grid gap-5">
         <header>
-          <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
-          <p className="text-sm text-ink-dim mt-1">
-            Everything is stored on this device.
-          </p>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {t('settings.title')}
+          </h1>
+          <p className="text-sm text-ink-dim mt-1">{t('settings.subtitle')}</p>
         </header>
 
         <section className="grid gap-4 rounded-2xl border border-line bg-surface-2 p-5">
-          <Field label="Your name">
+          <Field label={t('settings.language')}>
+            <LanguagePicker
+              value={settings.language ?? 'bg'}
+              onChange={(lang: Language) => set({ language: lang })}
+            />
+          </Field>
+
+          <Field label={t('settings.name')}>
             <input
               type="text"
               value={settings.name}
@@ -124,50 +141,53 @@ export function SettingsScreen({ settings, sessions }: Props) {
             />
           </Field>
 
-          <Field label="Accent color">
+          <Field label={t('settings.accent')}>
             <ColorSwatch
               value={settings.accentColor}
               onChange={(hex) => set({ accentColor: hex })}
             />
           </Field>
 
-          <Field label="Theme">
+          <Field label={t('settings.theme')}>
             <Segmented
               id="set-theme"
-              ariaLabel="Theme"
+              ariaLabel={t('settings.theme')}
               value={settings.themeMode}
               onChange={(v: ThemeMode) => set({ themeMode: v })}
               options={[
-                { value: 'system', label: 'System' },
-                { value: 'light', label: 'Light' },
-                { value: 'dark', label: 'Dark' }
+                { value: 'system', label: t('common.theme.system') },
+                { value: 'light', label: t('common.theme.light') },
+                { value: 'dark', label: t('common.theme.dark') }
               ]}
             />
           </Field>
         </section>
 
         <section className="grid gap-4 rounded-2xl border border-line bg-surface-2 p-5">
-          <Field label="Timezone">
+          <Field label={t('settings.timezone')}>
             <TimezonePicker
               value={settings.timezone}
               onChange={(tz) => set({ timezone: tz })}
             />
           </Field>
 
-          <Field label="Hour format">
+          <Field label={t('settings.hourFormat')}>
             <Segmented
               id="set-hour"
-              ariaLabel="Hour format"
+              ariaLabel={t('settings.hourFormat')}
               value={settings.hourFormat}
               onChange={(v: HourFormat) => set({ hourFormat: v })}
               options={[
-                { value: '24h', label: '24-hour' },
-                { value: '12h', label: '12-hour' }
+                { value: '24h', label: t('common.hour.24h') },
+                { value: '12h', label: t('common.hour.12h') }
               ]}
             />
           </Field>
 
-          <Field label="Default fasting target (hours)" hint="Used for new fasts. Existing fasts keep their original goal.">
+          <Field
+            label={t('settings.target')}
+            hint={t('settings.targetHint')}
+          >
             <input
               type="number"
               min={1}
@@ -188,20 +208,18 @@ export function SettingsScreen({ settings, sessions }: Props) {
 
         <section className="grid gap-3 rounded-2xl border border-line bg-surface-2 p-5">
           <div>
-            <h2 className="font-semibold tracking-tight">Data</h2>
-            <p className="text-sm text-ink-dim mt-1">
-              Export a backup or move your data to another device.
-            </p>
+            <h2 className="font-semibold tracking-tight">{t('settings.data')}</h2>
+            <p className="text-sm text-ink-dim mt-1">{t('settings.dataSub')}</p>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <Button variant="outline" onClick={handleExport}>
-              Export JSON
+              {t('settings.export')}
             </Button>
             <Button
               variant="outline"
               onClick={() => fileRef.current?.click()}
             >
-              Import JSON
+              {t('settings.import')}
             </Button>
           </div>
           <input
@@ -218,37 +236,38 @@ export function SettingsScreen({ settings, sessions }: Props) {
             variant="danger"
             onClick={() => setClearOpen(true)}
           >
-            Clear all history
+            {t('settings.clearHistory')}
           </Button>
         </section>
 
         <p className="text-xs text-ink-dim text-center">
-          Fasting Timer · {sessions.length} record
-          {sessions.length === 1 ? '' : 's'}
+          {sessions.length === 1
+            ? t('settings.footerOne')
+            : t('settings.footerMany', { count: sessions.length })}
         </p>
       </div>
 
       <Modal
         open={!!importOpen}
         onClose={() => setImportOpen(null)}
-        title="Import data"
+        title={t('settings.import.title')}
       >
         <div className="grid gap-3">
           <p className="text-sm text-ink-dim">
-            {importOpen?.payload.sessions.length} fast
-            {importOpen?.payload.sessions.length === 1 ? '' : 's'} found in
-            this file. Settings will be overwritten with the imported values.
+            {importCount === 1
+              ? t('settings.import.subOne')
+              : t('settings.import.subMany', { count: importCount })}
           </p>
           <div className="grid grid-cols-2 gap-2">
             <Button variant="ghost" onClick={() => applyImport('merge')}>
-              Merge into current
+              {t('settings.import.merge')}
             </Button>
             <Button variant="danger" onClick={() => applyImport('replace')}>
-              Replace existing
+              {t('settings.import.replace')}
             </Button>
           </div>
           <Button variant="outline" onClick={() => setImportOpen(null)}>
-            Cancel
+            {t('common.cancel')}
           </Button>
         </div>
       </Modal>
@@ -256,18 +275,16 @@ export function SettingsScreen({ settings, sessions }: Props) {
       <Modal
         open={clearOpen}
         onClose={() => setClearOpen(false)}
-        title="Clear all history?"
+        title={t('settings.clear.title')}
       >
         <div className="grid gap-3">
-          <p className="text-sm text-ink-dim">
-            This permanently deletes every recorded fast. Your settings are kept.
-          </p>
+          <p className="text-sm text-ink-dim">{t('settings.clear.sub')}</p>
           <div className="flex justify-end gap-2">
             <Button variant="ghost" onClick={() => setClearOpen(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button variant="danger" onClick={handleClearHistory}>
-              Delete everything
+              {t('settings.clear.confirm')}
             </Button>
           </div>
         </div>

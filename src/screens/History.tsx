@@ -16,6 +16,7 @@ import { StatCard } from '../components/StatCard';
 import { TimeEditModal } from '../components/TimeEditModal';
 import { deleteSession, updateSession } from '../db/db';
 import type { FastSession, Settings } from '../db/types';
+import { LOCALE, useLang, useT } from '../lib/i18n';
 import { computeStats, recentChartData } from '../lib/stats';
 import {
   formatDateTime,
@@ -29,11 +30,17 @@ interface Props {
 }
 
 export function HistoryScreen({ sessions, settings }: Props) {
+  const t = useT();
+  const lang = useLang();
+  const locale = LOCALE[lang];
   const stats = useMemo(
     () => computeStats(sessions, settings.timezone),
     [sessions, settings.timezone]
   );
-  const chartData = useMemo(() => recentChartData(sessions, 14), [sessions]);
+  const chartData = useMemo(
+    () => recentChartData(sessions, 14, locale),
+    [sessions, locale]
+  );
 
   const [editing, setEditing] = useState<{
     session: FastSession;
@@ -42,60 +49,68 @@ export function HistoryScreen({ sessions, settings }: Props) {
   const [confirmDelete, setConfirmDelete] = useState<FastSession | null>(null);
 
   const completed = sessions.filter((s) => s.endedAt !== null);
+  const hourSuffix = t('common.hourSuffix');
 
   return (
     <div className="app-shell">
       <div className="max-w-md mx-auto p-5 pt-6 grid gap-5">
         <header>
-          <h1 className="text-2xl font-semibold tracking-tight">History</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {t('history.title')}
+          </h1>
           <p className="text-sm text-ink-dim mt-1">
-            {stats.totalCompleted} completed · {stats.goalsHit} goals hit
+            {t('history.subtitle', {
+              completed: stats.totalCompleted,
+              goals: stats.goalsHit
+            })}
           </p>
         </header>
 
         <section className="grid grid-cols-2 gap-2">
           <StatCard
-            label="Avg duration"
+            label={t('history.stat.avg')}
             value={
               stats.averageHours > 0
-                ? `${stats.averageHours.toFixed(1)}h`
+                ? `${stats.averageHours.toFixed(1)}${hourSuffix}`
                 : '—'
             }
-            hint="over completed fasts"
+            hint={t('history.stat.avgHint')}
           />
           <StatCard
-            label="Longest"
+            label={t('history.stat.longest')}
             value={
               stats.longestHours > 0
-                ? `${stats.longestHours.toFixed(1)}h`
+                ? `${stats.longestHours.toFixed(1)}${hourSuffix}`
                 : '—'
             }
-            hint="personal best"
+            hint={t('history.stat.longestHint')}
           />
           <StatCard
-            label="Current streak"
+            label={t('history.stat.current')}
             value={`${stats.currentStreakDays}`}
-            hint="days hitting goal"
+            hint={t('history.stat.streakHint')}
             accent={stats.currentStreakDays > 0}
           />
           <StatCard
-            label="Best streak"
+            label={t('history.stat.best')}
             value={`${stats.bestStreakDays}`}
-            hint="days hitting goal"
+            hint={t('history.stat.streakHint')}
           />
         </section>
 
         <section className="rounded-2xl border border-line bg-surface-2 p-4">
           <div className="flex items-baseline justify-between">
             <h2 className="text-sm font-semibold tracking-tight">
-              Last {chartData.length || 0} fasts
+              {t('history.chart.title', { count: chartData.length || 0 })}
             </h2>
-            <span className="text-xs text-ink-dim">hours</span>
+            <span className="text-xs text-ink-dim">
+              {t('history.chart.hours')}
+            </span>
           </div>
           <div className="h-56 mt-2">
             {chartData.length === 0 ? (
               <div className="h-full grid place-items-center text-sm text-ink-dim">
-                No data yet — your fasts will show up here.
+                {t('history.chart.empty')}
               </div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
@@ -130,7 +145,10 @@ export function HistoryScreen({ sessions, settings }: Props) {
                       fontSize: 12,
                       color: 'rgb(var(--ink))'
                     }}
-                    formatter={(v: number) => [`${v}h`, 'Fast']}
+                    formatter={(v: number) => [
+                      `${v}${hourSuffix}`,
+                      t('history.chart.fast')
+                    ]}
                   />
                   <ReferenceLine
                     y={settings.targetHours}
@@ -157,11 +175,11 @@ export function HistoryScreen({ sessions, settings }: Props) {
 
         <section className="grid gap-2">
           <h2 className="text-sm font-semibold tracking-tight px-1">
-            All fasts
+            {t('history.all')}
           </h2>
           {completed.length === 0 && (
             <div className="rounded-2xl border border-line bg-surface-2 p-5 text-sm text-ink-dim">
-              Nothing logged yet. Start a fast from the timer screen.
+              {t('history.empty')}
             </div>
           )}
           {completed.map((s) => {
@@ -177,7 +195,8 @@ export function HistoryScreen({ sessions, settings }: Props) {
                   <div className="text-base font-semibold">
                     {formatDurationShort(ms)}
                     <span className="text-xs text-ink-dim ml-2 font-normal">
-                      {hours.toFixed(1)}h
+                      {hours.toFixed(1)}
+                      {hourSuffix}
                     </span>
                   </div>
                   <div
@@ -186,7 +205,9 @@ export function HistoryScreen({ sessions, settings }: Props) {
                       (hit ? 'text-accent' : 'text-ink-dim')
                     }
                   >
-                    {hit ? '✓ Goal hit' : `Goal ${s.targetHours}h`}
+                    {hit
+                      ? t('history.goalHit')
+                      : t('history.goal', { hours: s.targetHours })}
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-xs">
@@ -195,13 +216,14 @@ export function HistoryScreen({ sessions, settings }: Props) {
                     className="text-left rounded-lg border border-line bg-surface px-2 py-1.5 hover:border-accent/50"
                   >
                     <div className="text-[10px] uppercase tracking-wider text-ink-dim">
-                      Start
+                      {t('history.start')}
                     </div>
                     <div className="text-ink">
                       {formatDateTime(
                         s.startedAt,
                         settings.timezone,
-                        settings.hourFormat
+                        settings.hourFormat,
+                        locale
                       )}
                     </div>
                   </button>
@@ -210,13 +232,14 @@ export function HistoryScreen({ sessions, settings }: Props) {
                     className="text-left rounded-lg border border-line bg-surface px-2 py-1.5 hover:border-accent/50"
                   >
                     <div className="text-[10px] uppercase tracking-wider text-ink-dim">
-                      End
+                      {t('history.end')}
                     </div>
                     <div className="text-ink">
                       {formatDateTime(
                         s.endedAt!,
                         settings.timezone,
-                        settings.hourFormat
+                        settings.hourFormat,
+                        locale
                       )}
                     </div>
                   </button>
@@ -226,7 +249,7 @@ export function HistoryScreen({ sessions, settings }: Props) {
                     onClick={() => setConfirmDelete(s)}
                     className="text-xs text-ink-dim hover:text-[rgb(255,107,107)]"
                   >
-                    Delete
+                    {t('common.delete')}
                   </button>
                 </div>
               </div>
@@ -247,7 +270,9 @@ export function HistoryScreen({ sessions, settings }: Props) {
             }
           }}
           title={
-            editing.field === 'start' ? 'Edit start time' : 'Edit end time'
+            editing.field === 'start'
+              ? t('history.editStart')
+              : t('history.editEnd')
           }
           initial={
             editing.field === 'start'
@@ -269,15 +294,15 @@ export function HistoryScreen({ sessions, settings }: Props) {
       <Modal
         open={!!confirmDelete}
         onClose={() => setConfirmDelete(null)}
-        title="Delete this fast?"
+        title={t('history.confirmDelete.title')}
       >
         <div className="grid gap-3">
           <p className="text-sm text-ink-dim">
-            This will remove the entry permanently. This cannot be undone.
+            {t('history.confirmDelete.sub')}
           </p>
           <div className="flex gap-2 justify-end">
             <Button variant="ghost" onClick={() => setConfirmDelete(null)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               variant="danger"
@@ -286,7 +311,7 @@ export function HistoryScreen({ sessions, settings }: Props) {
                 setConfirmDelete(null);
               }}
             >
-              Delete
+              {t('common.delete')}
             </Button>
           </div>
         </div>

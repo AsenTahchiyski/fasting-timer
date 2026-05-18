@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Modal } from './Modal';
 import { Button } from './Button';
 import { epochToLocalInput, localInputToEpoch } from '../lib/time';
+import { useT } from '../lib/i18n';
 
 interface Props {
   open: boolean;
@@ -25,6 +26,7 @@ export function TimeEditModal({
   min,
   max
 }: Props) {
+  const t = useT();
   const [value, setValue] = useState(epochToLocalInput(initial, timezone));
   const [error, setError] = useState<string | null>(null);
 
@@ -38,15 +40,15 @@ export function TimeEditModal({
   const handleSave = () => {
     const ms = localInputToEpoch(value, timezone);
     if (Number.isNaN(ms)) {
-      setError('Invalid date');
+      setError(t('timeEdit.invalid'));
       return;
     }
     if (min !== undefined && ms < min) {
-      setError('Time must be after the previous boundary.');
+      setError(t('timeEdit.beforeMin'));
       return;
     }
     if (max !== undefined && ms > max) {
-      setError('Time cannot be in the future.');
+      setError(t('timeEdit.afterMax'));
       return;
     }
     onSave(ms);
@@ -70,9 +72,9 @@ export function TimeEditModal({
         )}
         <div className="flex gap-2 justify-end">
           <Button variant="ghost" onClick={onClose}>
-            Cancel
+            {t('common.cancel')}
           </Button>
-          <Button onClick={handleSave}>Save</Button>
+          <Button onClick={handleSave}>{t('common.save')}</Button>
         </div>
       </div>
     </Modal>

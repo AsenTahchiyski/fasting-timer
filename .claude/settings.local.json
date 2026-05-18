@@ -5,7 +5,9 @@
       "WebFetch(domain:asentahchiyski.github.io)",
       "Bash(curl -sI https://asentahchiyski.github.io/fasting-timer/manifest.webmanifest)",
       "Bash(curl -sI https://asentahchiyski.github.io/fasting-timer/)",
-      "Bash(curl -s https://asentahchiyski.github.io/fasting-timer/)"
+      "Bash(curl -s https://asentahchiyski.github.io/fasting-timer/)",
+      "Bash(awk '/^const en: Dict/,/^};/' /home/asen/Dev/claude/fasting-timer/src/lib/i18n.ts)",
+      "Bash(awk '/^const bg: Dict/,/^};/' /home/asen/Dev/claude/fasting-timer/src/lib/i18n.ts)"
     ]
   }
 }

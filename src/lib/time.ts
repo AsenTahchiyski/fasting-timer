@@ -43,9 +43,10 @@ export function formatHoursDecimal(ms: number): string {
 export function formatDateTime(
   ms: number,
   timezone: string,
-  hourFormat: HourFormat
+  hourFormat: HourFormat,
+  locale?: string
 ): string {
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat(locale, {
     timeZone: timezone,
     weekday: 'short',
     month: 'short',
@@ -59,9 +60,10 @@ export function formatDateTime(
 export function formatTime(
   ms: number,
   timezone: string,
-  hourFormat: HourFormat
+  hourFormat: HourFormat,
+  locale?: string
 ): string {
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat(locale, {
     timeZone: timezone,
     hour: 'numeric',
     minute: '2-digit',
@@ -69,8 +71,8 @@ export function formatTime(
   }).format(new Date(ms));
 }
 
-export function formatDay(ms: number, timezone: string): string {
-  return new Intl.DateTimeFormat(undefined, {
+export function formatDay(ms: number, timezone: string, locale?: string): string {
+  return new Intl.DateTimeFormat(locale, {
     timeZone: timezone,
     month: 'short',
     day: 'numeric'

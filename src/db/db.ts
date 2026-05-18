@@ -28,6 +28,7 @@ export const defaultSettings = (): Settings => {
     timezone: tz,
     hourFormat: '24h',
     targetHours: 16,
+    language: 'bg',
     onboarded: false,
     createdAt: now,
     updatedAt: now
@@ -36,7 +37,14 @@ export const defaultSettings = (): Settings => {
 
 export async function ensureSettings(): Promise<Settings> {
   const existing = await db.settings.get('default');
-  if (existing) return existing;
+  if (existing) {
+    if (!existing.language) {
+      const patched: Settings = { ...existing, language: 'bg' };
+      await db.settings.put(patched);
+      return patched;
+    }
+    return existing;
+  }
   const fresh = defaultSettings();
   await db.settings.put(fresh);
   return fresh;

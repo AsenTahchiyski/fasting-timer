@@ -1,18 +1,19 @@
 import { motion } from 'framer-motion';
 import { cx } from '../lib/cx';
+import { useT } from '../lib/i18n';
 
 export type TabId = 'timer' | 'history' | 'settings';
 
 interface TabDef {
   id: TabId;
-  label: string;
+  labelKey: string;
   icon: React.ReactNode;
 }
 
 const TABS: TabDef[] = [
   {
     id: 'timer',
-    label: 'Timer',
+    labelKey: 'tab.timer',
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="13" r="8" />
@@ -23,7 +24,7 @@ const TABS: TabDef[] = [
   },
   {
     id: 'history',
-    label: 'History',
+    labelKey: 'tab.history',
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <path d="M3 12a9 9 0 1 0 3-6.7" />
@@ -34,7 +35,7 @@ const TABS: TabDef[] = [
   },
   {
     id: 'settings',
-    label: 'Settings',
+    labelKey: 'tab.settings',
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="3" />
@@ -50,6 +51,7 @@ interface Props {
 }
 
 export function TabBar({ active, onSelect }: Props) {
+  const t = useT();
   return (
     <nav
       aria-label="Primary"
@@ -57,12 +59,12 @@ export function TabBar({ active, onSelect }: Props) {
     >
       <div className="mx-auto max-w-md px-3 pb-3">
         <div className="glass border border-line rounded-2xl shadow-[0_-2px_30px_-10px_rgb(0_0_0/0.2)] flex">
-          {TABS.map((t) => {
-            const isActive = active === t.id;
+          {TABS.map((tab) => {
+            const isActive = active === tab.id;
             return (
               <button
-                key={t.id}
-                onClick={() => onSelect(t.id)}
+                key={tab.id}
+                onClick={() => onSelect(tab.id)}
                 className={cx(
                   'relative flex-1 py-2.5 flex flex-col items-center gap-0.5 text-xs font-medium',
                   isActive ? 'text-accent' : 'text-ink-dim'
@@ -76,8 +78,8 @@ export function TabBar({ active, onSelect }: Props) {
                     transition={{ type: 'spring', stiffness: 500, damping: 38 }}
                   />
                 )}
-                <span className="relative">{t.icon}</span>
-                <span className="relative">{t.label}</span>
+                <span className="relative">{tab.icon}</span>
+                <span className="relative">{t(tab.labelKey)}</span>
               </button>
             );
           })}

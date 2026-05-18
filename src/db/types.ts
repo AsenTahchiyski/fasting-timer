@@ -1,5 +1,6 @@
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type HourFormat = '24h' | '12h';
+export type Language = 'bg' | 'en';
 
 export interface Settings {
   id: 'default';
@@ -9,6 +10,7 @@ export interface Settings {
   timezone: string; // IANA, e.g. "Europe/Sofia"
   hourFormat: HourFormat;
   targetHours: number; // fasting target in hours, e.g. 16
+  language: Language;
   onboarded: boolean;
   createdAt: number;
   updatedAt: number;

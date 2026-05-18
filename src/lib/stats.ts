@@ -83,7 +83,8 @@ export interface ChartPoint {
 
 export function recentChartData(
   sessions: FastSession[],
-  count: number
+  count: number,
+  locale?: string
 ): ChartPoint[] {
   const completed = sessions
     .filter((s) => s.endedAt !== null)
@@ -92,7 +93,7 @@ export function recentChartData(
   return completed.map((s) => {
     const hrs = (s.endedAt! - s.startedAt) / HOUR_MS;
     return {
-      label: new Date(s.startedAt).toLocaleDateString(undefined, {
+      label: new Date(s.startedAt).toLocaleDateString(locale, {
         month: 'short',
         day: 'numeric'
       }),

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Modal } from './Modal';
 import { cityFromTimezone, listTimezones } from '../lib/time';
+import { useT } from '../lib/i18n';
 
 interface Props {
   value: string;
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export function TimezonePicker({ value, onChange }: Props) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const all = useMemo(() => listTimezones(), []);
@@ -41,11 +43,11 @@ export function TimezonePicker({ value, onChange }: Props) {
         </svg>
       </button>
 
-      <Modal open={open} onClose={() => setOpen(false)} title="Timezone">
+      <Modal open={open} onClose={() => setOpen(false)} title={t('tz.title')}>
         <div className="grid gap-3">
           <input
             type="text"
-            placeholder="Search city or zone…"
+            placeholder={t('tz.search')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="w-full h-11 px-3 rounded-xl border border-line bg-surface"
@@ -53,7 +55,7 @@ export function TimezonePicker({ value, onChange }: Props) {
           />
           <div className="max-h-72 overflow-y-auto rounded-xl border border-line divide-y divide-line">
             {filtered.length === 0 && (
-              <div className="p-4 text-sm text-ink-dim">No matches.</div>
+              <div className="p-4 text-sm text-ink-dim">{t('tz.noMatches')}</div>
             )}
             {filtered.slice(0, 200).map((tz) => (
               <button
@@ -76,7 +78,7 @@ export function TimezonePicker({ value, onChange }: Props) {
             ))}
             {filtered.length > 200 && (
               <div className="p-3 text-xs text-ink-dim">
-                Showing first 200. Refine to narrow down.
+                {t('tz.showingFirst')}
               </div>
             )}
           </div>
