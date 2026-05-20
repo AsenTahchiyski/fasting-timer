@@ -6,6 +6,7 @@ import { ProgressRing } from '../components/ProgressRing';
 import { StageCard } from '../components/StageCard';
 import { TimeEditModal } from '../components/TimeEditModal';
 import {
+  deleteSession,
   startSession,
   stopSession,
   updateSession
@@ -35,6 +36,7 @@ export function TimerScreen({ settings, active, last }: Props) {
   const [editStartOpen, setEditStartOpen] = useState(false);
   const [editLastEndOpen, setEditLastEndOpen] = useState(false);
   const [confirmStopOpen, setConfirmStopOpen] = useState(false);
+  const [confirmDiscardOpen, setConfirmDiscardOpen] = useState(false);
   const [summary, setSummary] = useState<{
     started: number;
     ended: number;
@@ -70,6 +72,12 @@ export function TimerScreen({ settings, active, last }: Props) {
       target: active.targetHours
     });
     setConfirmStopOpen(false);
+  };
+
+  const handleDiscard = async () => {
+    if (!active?.id) return;
+    await deleteSession(active.id);
+    setConfirmDiscardOpen(false);
   };
 
   const handleEditStart = async (ms: number) => {
@@ -183,6 +191,12 @@ export function TimerScreen({ settings, active, last }: Props) {
             >
               {t('timer.endFast')}
             </Button>
+            <button
+              onClick={() => setConfirmDiscardOpen(true)}
+              className="-mt-2 text-sm text-ink-dim hover:text-[rgb(255,107,107)] transition-colors underline-offset-4 hover:underline"
+            >
+              {t('timer.discardFast')}
+            </button>
           </>
         ) : (
           <>
@@ -278,6 +292,26 @@ export function TimerScreen({ settings, active, last }: Props) {
         elapsedMs={elapsedMs}
         targetHours={target}
       />
+
+      <Modal
+        open={confirmDiscardOpen}
+        onClose={() => setConfirmDiscardOpen(false)}
+        title={t('timer.confirmDiscard.title')}
+      >
+        <div className="grid gap-3">
+          <p className="text-sm text-ink-dim">
+            {t('timer.confirmDiscard.sub')}
+          </p>
+          <div className="flex gap-2 justify-end">
+            <Button variant="ghost" onClick={() => setConfirmDiscardOpen(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button variant="danger" onClick={handleDiscard}>
+              {t('timer.confirmDiscard.confirm')}
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
       <SummaryModal
         summary={summary}

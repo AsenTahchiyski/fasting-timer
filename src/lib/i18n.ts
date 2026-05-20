@@ -98,6 +98,11 @@ const en: Dict = {
   'timer.confirmEnd.short':
     'You’ve fasted for {elapsed}, {remaining} short of your {target}h goal.',
   'timer.confirmEnd.keep': 'Keep fasting',
+  'timer.discardFast': 'Discard this fast',
+  'timer.confirmDiscard.title': 'Discard this fast?',
+  'timer.confirmDiscard.sub':
+    'This removes the active fast without saving it to history. Use this if you broke your fast and don’t want it recorded.',
+  'timer.confirmDiscard.confirm': 'Discard',
   'timer.summary.title': 'Fast complete',
   'timer.summary.total': 'Total',
   'timer.summary.goalLine': '{hours}h · goal {target}h',
@@ -307,7 +312,7 @@ const bg: Dict = {
   'timer.greeting.friend': 'приятел',
   'timer.goalReached': 'Целта е постигната',
   'timer.elapsed': 'Изминали',
-  'timer.sinceLast': 'След последното гладуване',
+  'timer.sinceLast': 'Без гладуване',
   'timer.goalProgress': 'Цел {hours}ч',
   'timer.started': 'Начало',
   'timer.tapToEdit': 'Натисни за редакция',
@@ -330,6 +335,11 @@ const bg: Dict = {
   'timer.confirmEnd.short':
     'Гладува {elapsed}, остават {remaining} до целта от {target}ч.',
   'timer.confirmEnd.keep': 'Продължи гладуването',
+  'timer.discardFast': 'Откажи това гладуване',
+  'timer.confirmDiscard.title': 'Отказване на гладуването?',
+  'timer.confirmDiscard.sub':
+    'Активното гладуване ще бъде премахнато, без да се запази в историята. Използвай, ако си прекъснал гладуването и не искаш да остане запис.',
+  'timer.confirmDiscard.confirm': 'Откажи',
   'timer.summary.title': 'Гладуването е завършено',
   'timer.summary.total': 'Общо',
   'timer.summary.goalLine': '{hours}ч · цел {target}ч',
