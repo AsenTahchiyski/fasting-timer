@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useMemo, useState } from 'react';
 import { Button } from '../components/Button';
+import { Confetti } from '../components/Confetti';
 import { Modal } from '../components/Modal';
 import { ProgressRing } from '../components/ProgressRing';
 import { StageCard } from '../components/StageCard';
@@ -21,14 +22,16 @@ import {
   HOUR_MS
 } from '../lib/time';
 import { nextStage, stageForHours } from '../lib/stages';
+import { computeStats } from '../lib/stats';
 
 interface Props {
   settings: Settings;
   active: FastSession | undefined;
   last: FastSession | undefined;
+  sessions: FastSession[];
 }
 
-export function TimerScreen({ settings, active, last }: Props) {
+export function TimerScreen({ settings, active, last, sessions }: Props) {
   const t = useT();
   const lang = useLang();
   const locale = LOCALE[lang];
@@ -41,6 +44,7 @@ export function TimerScreen({ settings, active, last }: Props) {
     started: number;
     ended: number;
     target: number;
+    streak: number;
   } | null>(null);
 
   const isFasting = !!active;
@@ -66,10 +70,16 @@ export function TimerScreen({ settings, active, last }: Props) {
     if (!active?.id) return;
     const ended = Date.now();
     await stopSession(active.id, ended);
+    const completed: FastSession = { ...active, endedAt: ended };
+    const merged = sessions.some((s) => s.id === active.id)
+      ? sessions.map((s) => (s.id === active.id ? completed : s))
+      : [completed, ...sessions];
+    const stats = computeStats(merged, settings.timezone);
     setSummary({
       started: active.startedAt,
       ended,
-      target: active.targetHours
+      target: active.targetHours,
+      streak: stats.currentStreakDays
     });
     setConfirmStopOpen(false);
   };
@@ -377,7 +387,12 @@ function SummaryModal({
   settings,
   onClose
 }: {
-  summary: { started: number; ended: number; target: number } | null;
+  summary: {
+    started: number;
+    ended: number;
+    target: number;
+    streak: number;
+  } | null;
   settings: Settings;
   onClose: () => void;
 }) {
@@ -389,8 +404,14 @@ function SummaryModal({
   const hours = ms / HOUR_MS;
   const reached = hours >= summary.target;
   const stage = stageForHours(hours);
+  const streakLine =
+    summary.streak <= 1
+      ? t('timer.summary.streakOne')
+      : t('timer.summary.streakMany', { streak: summary.streak });
   return (
-    <Modal open={!!summary} onClose={onClose} title={t('timer.summary.title')}>
+    <>
+      {reached && <Confetti />}
+      <Modal open={!!summary} onClose={onClose} title={t('timer.summary.title')}>
       <div className="grid gap-4">
         <div className="text-center py-3">
           <div className="text-xs uppercase tracking-[0.18em] text-ink-dim">
@@ -406,6 +427,17 @@ function SummaryModal({
             })}{' '}
             {reached ? '✓' : ''}
           </div>
+          {reached && summary.streak > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15, duration: 0.35 }}
+              className="mt-3 rounded-2xl border border-accent/40 bg-accent/10 px-3 py-2 text-sm"
+            >
+              <div className="font-medium">{t('timer.summary.celebrate')}</div>
+              <div className="text-ink-dim mt-0.5">{streakLine}</div>
+            </motion.div>
+          )}
         </div>
 
         <div className="grid grid-cols-2 gap-2 text-sm">
@@ -451,6 +483,7 @@ function SummaryModal({
           {t('common.done')}
         </Button>
       </div>
-    </Modal>
+      </Modal>
+    </>
   );
 }

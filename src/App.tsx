@@ -43,6 +43,7 @@ export function App() {
                   settings={settings}
                   active={active ?? undefined}
                   last={last ?? undefined}
+                  sessions={sessions}
                 />
               )}
               {tab === 'history' && (

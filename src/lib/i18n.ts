@@ -107,6 +107,9 @@ const en: Dict = {
   'timer.summary.total': 'Total',
   'timer.summary.goalLine': '{hours}h · goal {target}h',
   'timer.summary.stageReached': 'Stage reached',
+  'timer.summary.celebrate': 'Goal smashed — well done!',
+  'timer.summary.streakOne': 'Day 1 of a new streak — let’s keep it going.',
+  'timer.summary.streakMany': '{streak}-day streak — you’re on fire!',
 
   // Stage card
   'stageCard.current': 'Current stage',
@@ -344,6 +347,9 @@ const bg: Dict = {
   'timer.summary.total': 'Общо',
   'timer.summary.goalLine': '{hours}ч · цел {target}ч',
   'timer.summary.stageReached': 'Достигнат етап',
+  'timer.summary.celebrate': 'Целта е постигната — браво!',
+  'timer.summary.streakOne': 'Ден 1 от нова серия — продължавай!',
+  'timer.summary.streakMany': 'Серия от {streak} дни — страхотно!',
 
   // Stage card
   'stageCard.current': 'Текущ етап',
