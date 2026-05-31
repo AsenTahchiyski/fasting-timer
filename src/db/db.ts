@@ -1,5 +1,5 @@
 import Dexie, { type Table } from 'dexie';
-import type { FastSession, Settings } from './types';
+import type { ExportPayload, FastSession, Settings } from './types';
 
 class FastingDB extends Dexie {
   settings!: Table<Settings, 'default'>;
@@ -99,4 +99,25 @@ export async function getLastCompletedSession(): Promise<FastSession | undefined
 
 export async function getAllSessions(): Promise<FastSession[]> {
   return db.sessions.orderBy('startedAt').reverse().toArray();
+}
+
+export async function isDatabaseEmpty(): Promise<boolean> {
+  const [settingsCount, sessionCount] = await Promise.all([
+    db.settings.count(),
+    db.sessions.count()
+  ]);
+  return settingsCount === 0 && sessionCount === 0;
+}
+
+export async function restoreFromPayload(payload: ExportPayload): Promise<void> {
+  await db.transaction('rw', db.settings, db.sessions, async () => {
+    await db.sessions.clear();
+    const settings: Settings = { ...payload.settings, id: 'default' };
+    await db.settings.put(settings);
+    for (const s of payload.sessions) {
+      const { id: _id, ...rest } = s;
+      void _id;
+      await db.sessions.add(rest);
+    }
+  });
 }

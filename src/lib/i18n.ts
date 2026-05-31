@@ -178,6 +178,13 @@ const en: Dict = {
   'settings.toast.importedReplace': 'Imported (replaced)',
   'settings.toast.cleared': 'History cleared',
 
+  // Backup reminder
+  'backup.reminder.title': 'Back up your data',
+  'backup.reminder.sub':
+    'Your data is stored only on this device. Save a backup file so you don’t lose it if the browser clears its storage.',
+  'backup.reminder.action': 'Save backup',
+  'backup.reminder.dismiss': 'Later',
+
   // Timezone picker
   'tz.title': 'Timezone',
   'tz.search': 'Search city or zone…',
@@ -419,6 +426,13 @@ const bg: Dict = {
   'settings.toast.importedMerge': 'Импортирано (обединено)',
   'settings.toast.importedReplace': 'Импортирано (заменено)',
   'settings.toast.cleared': 'Историята е изчистена',
+
+  // Backup reminder
+  'backup.reminder.title': 'Направи резервно копие',
+  'backup.reminder.sub':
+    'Данните ти се пазят само на това устройство. Запази резервен файл, за да не ги загубиш, ако браузърът изчисти хранилището си.',
+  'backup.reminder.action': 'Запази копие',
+  'backup.reminder.dismiss': 'По-късно',
 
   // Timezone picker
   'tz.title': 'Часова зона',

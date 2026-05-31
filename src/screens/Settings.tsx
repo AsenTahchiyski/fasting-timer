@@ -16,6 +16,7 @@ import type {
   ThemeMode
 } from '../db/types';
 import { useT } from '../lib/i18n';
+import { buildPayload, downloadPayload } from '../lib/backup';
 
 interface Props {
   settings: Settings;
@@ -34,27 +35,7 @@ export function SettingsScreen({ settings, sessions }: Props) {
   const set = (patch: Partial<Settings>) => updateSettings(patch);
 
   const handleExport = () => {
-    const payload: ExportPayload = {
-      version: 1,
-      exportedAt: Date.now(),
-      settings,
-      sessions
-    };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], {
-      type: 'application/json'
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    const stamp = new Date()
-      .toISOString()
-      .replace(/[:.]/g, '-')
-      .slice(0, 19);
-    a.download = `fasting-timer-${stamp}.json`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
+    downloadPayload(buildPayload(settings, sessions));
     flash(t('settings.toast.exported'));
   };
 
