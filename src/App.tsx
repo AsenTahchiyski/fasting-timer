@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { BackupReminder } from './components/BackupReminder';
 import { TabBar, type TabId } from './components/TabBar';
 import { useAutoBackup } from './hooks/useAutoBackup';
 import {
@@ -57,7 +56,6 @@ export function App() {
                 <SettingsScreen sessions={sessions} settings={settings} />
               )}
             </motion.div>
-            <BackupReminder settings={settings} sessions={sessions} />
             <TabBar active={tab} onSelect={setTab} />
           </>
         )}

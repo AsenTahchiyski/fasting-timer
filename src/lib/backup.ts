@@ -5,10 +5,6 @@ import type { ExportPayload, FastSession, Settings } from '../db/types';
 // origin storage clear wipes localStorage too — the off-device backup
 // file (downloadPayload) is the only guard against that.
 const LOCAL_BACKUP_KEY = 'fasting-timer-backup-v1';
-const LAST_BACKUP_KEY = 'fasting-timer-last-backup-v1';
-
-// Nudge the user to save an off-device backup if it's been this long.
-export const BACKUP_REMINDER_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 export function buildPayload(
   settings: Settings,
@@ -22,7 +18,9 @@ export function buildPayload(
   };
 }
 
-function isValidPayload(p: Partial<ExportPayload> | null): p is ExportPayload {
+export function isValidPayload(
+  p: Partial<ExportPayload> | null
+): p is ExportPayload {
   return (
     !!p && p.version === 1 && !!p.settings && Array.isArray(p.sessions)
   );
@@ -68,20 +66,6 @@ export function readLocalBackup(): ExportPayload | null {
   }
 }
 
-export function getLastBackupAt(): number | null {
-  const raw = localStorage.getItem(LAST_BACKUP_KEY);
-  const n = raw ? Number(raw) : NaN;
-  return Number.isFinite(n) ? n : null;
-}
-
-export function markBackedUp(at: number = Date.now()): void {
-  try {
-    localStorage.setItem(LAST_BACKUP_KEY, String(at));
-  } catch {
-    // ignore
-  }
-}
-
 /**
  * Download a JSON file. This lands outside the origin's storage box (in the
  * device's Downloads), so it survives a full browser storage clear.
@@ -102,5 +86,4 @@ export function downloadPayload(payload: ExportPayload): void {
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
-  markBackedUp(payload.exportedAt);
 }

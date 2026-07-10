@@ -177,13 +177,19 @@ const en: Dict = {
   'settings.toast.importedMerge': 'Imported (merged)',
   'settings.toast.importedReplace': 'Imported (replaced)',
   'settings.toast.cleared': 'History cleared',
+  'settings.toast.backupSet': 'Backup file updated',
+  'settings.toast.backupDefault': 'Using the default backup file',
 
-  // Backup reminder
-  'backup.reminder.title': 'Back up your data',
-  'backup.reminder.sub':
-    'Your data is stored only on this device. Save a backup file so you don’t lose it if the browser clears its storage.',
-  'backup.reminder.action': 'Save backup',
-  'backup.reminder.dismiss': 'Later',
+  // Backup file
+  'settings.backup.label': 'Backup file',
+  'settings.backup.defaultPath': 'App storage · {name}',
+  'settings.backup.hint':
+    'Kept up to date automatically on every change.',
+  'settings.backup.needsPermission':
+    'The browser needs permission to keep writing to this file. Until you allow it, backups go to the default file in app storage.',
+  'settings.backup.allow': 'Allow access',
+  'settings.backup.choose': 'Choose file…',
+  'settings.backup.useDefault': 'Use default',
 
   // Timezone picker
   'tz.title': 'Timezone',
@@ -426,13 +432,19 @@ const bg: Dict = {
   'settings.toast.importedMerge': 'Импортирано (обединено)',
   'settings.toast.importedReplace': 'Импортирано (заменено)',
   'settings.toast.cleared': 'Историята е изчистена',
+  'settings.toast.backupSet': 'Резервният файл е обновен',
+  'settings.toast.backupDefault': 'Използва се файлът по подразбиране',
 
-  // Backup reminder
-  'backup.reminder.title': 'Направи резервно копие',
-  'backup.reminder.sub':
-    'Данните ти се пазят само на това устройство. Запази резервен файл, за да не ги загубиш, ако браузърът изчисти хранилището си.',
-  'backup.reminder.action': 'Запази копие',
-  'backup.reminder.dismiss': 'По-късно',
+  // Backup file
+  'settings.backup.label': 'Резервен файл',
+  'settings.backup.defaultPath': 'Хранилище на приложението · {name}',
+  'settings.backup.hint':
+    'Обновява се автоматично при всяка промяна.',
+  'settings.backup.needsPermission':
+    'Браузърът има нужда от разрешение, за да продължи да записва в този файл. Докато не го дадеш, копията отиват във файла по подразбиране в хранилището на приложението.',
+  'settings.backup.allow': 'Разреши достъп',
+  'settings.backup.choose': 'Избери файл…',
+  'settings.backup.useDefault': 'По подразбиране',
 
   // Timezone picker
   'tz.title': 'Часова зона',

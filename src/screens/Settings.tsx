@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '../components/Button';
 import { ColorSwatch } from '../components/ColorSwatch';
 import { Field } from '../components/Field';
@@ -17,6 +17,15 @@ import type {
 } from '../db/types';
 import { useT } from '../lib/i18n';
 import { buildPayload, downloadPayload } from '../lib/backup';
+import {
+  chooseBackupFile,
+  clearBackupFile,
+  getBackupTarget,
+  requestBackupFileAccess,
+  supportsFilePicker,
+  writeBackupFile,
+  type BackupTarget
+} from '../lib/fileSync';
 
 interface Props {
   settings: Settings;
@@ -31,8 +40,37 @@ export function SettingsScreen({ settings, sessions }: Props) {
   } | null>(null);
   const [clearOpen, setClearOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [backupTarget, setBackupTarget] = useState<BackupTarget | null>(null);
+
+  useEffect(() => {
+    void getBackupTarget().then(setBackupTarget);
+  }, []);
 
   const set = (patch: Partial<Settings>) => updateSettings(patch);
+
+  const handleChooseBackupFile = async () => {
+    const name = await chooseBackupFile();
+    if (!name) return; // cancelled
+    await writeBackupFile(buildPayload(settings, sessions));
+    setBackupTarget(await getBackupTarget());
+    flash(t('settings.toast.backupSet'));
+  };
+
+  const handleDefaultBackupFile = async () => {
+    await clearBackupFile();
+    await writeBackupFile(buildPayload(settings, sessions));
+    setBackupTarget(await getBackupTarget());
+    flash(t('settings.toast.backupDefault'));
+  };
+
+  const handleAllowBackupAccess = async () => {
+    const granted = await requestBackupFileAccess();
+    if (granted) {
+      await writeBackupFile(buildPayload(settings, sessions));
+      flash(t('settings.toast.backupSet'));
+    }
+    setBackupTarget(await getBackupTarget());
+  };
 
   const handleExport = () => {
     downloadPayload(buildPayload(settings, sessions));
@@ -192,6 +230,48 @@ export function SettingsScreen({ settings, sessions }: Props) {
             <h2 className="font-semibold tracking-tight">{t('settings.data')}</h2>
             <p className="text-sm text-ink-dim mt-1">{t('settings.dataSub')}</p>
           </div>
+
+          {backupTarget && (
+            <div className="grid gap-2 rounded-xl border border-line bg-surface p-4">
+              <div className="text-sm font-medium">
+                {t('settings.backup.label')}
+              </div>
+              <div className="text-sm text-ink-dim break-all">
+                {backupTarget.mode === 'file'
+                  ? backupTarget.name
+                  : t('settings.backup.defaultPath', {
+                      name: backupTarget.name
+                    })}
+              </div>
+              <p className="text-xs text-ink-dim">
+                {t('settings.backup.hint')}
+              </p>
+              {backupTarget.mode === 'file' &&
+                backupTarget.permission !== 'granted' && (
+                  <>
+                    <p className="text-xs text-ink-dim">
+                      {t('settings.backup.needsPermission')}
+                    </p>
+                    <Button onClick={handleAllowBackupAccess}>
+                      {t('settings.backup.allow')}
+                    </Button>
+                  </>
+                )}
+              <div className="grid grid-cols-2 gap-2">
+                {supportsFilePicker() && (
+                  <Button variant="outline" onClick={handleChooseBackupFile}>
+                    {t('settings.backup.choose')}
+                  </Button>
+                )}
+                {backupTarget.mode === 'file' && (
+                  <Button variant="outline" onClick={handleDefaultBackupFile}>
+                    {t('settings.backup.useDefault')}
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-2">
             <Button variant="outline" onClick={handleExport}>
               {t('settings.export')}

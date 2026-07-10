@@ -1,15 +1,29 @@
 import Dexie, { type Table } from 'dexie';
 import type { ExportPayload, FastSession, Settings } from './types';
 
+interface KVEntry {
+  key: string;
+  value: unknown;
+}
+
 class FastingDB extends Dexie {
   settings!: Table<Settings, 'default'>;
   sessions!: Table<FastSession, number>;
+  kv!: Table<KVEntry, string>;
 
   constructor() {
     super('fasting-timer');
     this.version(1).stores({
       settings: 'id',
       sessions: '++id, startedAt, endedAt'
+    });
+    // v2 adds a kv table for values that must survive across sessions but
+    // aren't user settings — e.g. the FileSystemFileHandle of the backup file
+    // (handles are structured-cloneable, so IndexedDB can store them).
+    this.version(2).stores({
+      settings: 'id',
+      sessions: '++id, startedAt, endedAt',
+      kv: 'key'
     });
   }
 }
@@ -52,6 +66,19 @@ export async function ensureSettings(): Promise<Settings> {
 
 export async function updateSettings(patch: Partial<Settings>): Promise<void> {
   await db.settings.update('default', { ...patch, updatedAt: Date.now() });
+}
+
+export async function getKV<T>(key: string): Promise<T | undefined> {
+  const entry = await db.kv.get(key);
+  return entry?.value as T | undefined;
+}
+
+export async function setKV(key: string, value: unknown): Promise<void> {
+  await db.kv.put({ key, value });
+}
+
+export async function deleteKV(key: string): Promise<void> {
+  await db.kv.delete(key);
 }
 
 export async function getActiveSession(): Promise<FastSession | undefined> {
