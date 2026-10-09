@@ -98,6 +98,7 @@ const en: Dict = {
   'timer.confirmEnd.short':
     'You’ve fasted for {elapsed}, {remaining} short of your {target}h goal.',
   'timer.confirmEnd.keep': 'Keep fasting',
+  'timer.confirmEnd.endAt': 'Ended at',
   'timer.discardFast': 'Discard this fast',
   'timer.confirmDiscard.title': 'Discard this fast?',
   'timer.confirmDiscard.sub':
@@ -351,6 +352,7 @@ const bg: Dict = {
   'timer.confirmEnd.short':
     'Гладува {elapsed}, остават {remaining} до целта от {target}ч.',
   'timer.confirmEnd.keep': 'Продължи гладуването',
+  'timer.confirmEnd.endAt': 'Край в',
   'timer.discardFast': 'Откажи това гладуване',
   'timer.confirmDiscard.title': 'Отказване на гладуването?',
   'timer.confirmDiscard.sub':

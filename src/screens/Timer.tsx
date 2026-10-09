@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Button } from '../components/Button';
 import { Confetti } from '../components/Confetti';
+import { Field } from '../components/Field';
 import { Modal } from '../components/Modal';
 import { ProgressRing } from '../components/ProgressRing';
 import { StageCard } from '../components/StageCard';
@@ -19,7 +20,9 @@ import {
   formatDateTime,
   formatDuration,
   formatDurationShort,
-  HOUR_MS
+  epochToLocalInput,
+  HOUR_MS,
+  localInputToEpoch
 } from '../lib/time';
 import { nextStage, stageForHours } from '../lib/stages';
 import { computeStats } from '../lib/stats';
@@ -66,9 +69,8 @@ export function TimerScreen({ settings, active, last, sessions }: Props) {
     await startSession(Date.now(), settings.targetHours);
   };
 
-  const handleStop = async () => {
+  const handleStop = async (ended: number) => {
     if (!active?.id) return;
-    const ended = Date.now();
     await stopSession(active.id, ended);
     const completed: FastSession = { ...active, endedAt: ended };
     const merged = sessions.some((s) => s.id === active.id)
@@ -299,8 +301,10 @@ export function TimerScreen({ settings, active, last, sessions }: Props) {
         open={confirmStopOpen}
         onClose={() => setConfirmStopOpen(false)}
         onConfirm={handleStop}
-        elapsedMs={elapsedMs}
+        now={now}
+        startedAt={active?.startedAt ?? now}
         targetHours={target}
+        timezone={settings.timezone}
       />
 
       <Modal
@@ -344,16 +348,35 @@ function ConfirmStopModal({
   open,
   onClose,
   onConfirm,
-  elapsedMs,
-  targetHours
+  now,
+  startedAt,
+  targetHours,
+  timezone
 }: {
   open: boolean;
   onClose: () => void;
-  onConfirm: () => void;
-  elapsedMs: number;
+  onConfirm: (endedAt: number) => void;
+  now: number;
+  startedAt: number;
   targetHours: number;
+  timezone: string;
 }) {
   const t = useT();
+  // null = not edited: the end time follows "now" (with full precision).
+  const [endValue, setEndValue] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (open) {
+      setEndValue(null);
+      setError(null);
+    }
+  }, [open]);
+
+  const parsedEnd =
+    endValue === null ? now : localInputToEpoch(endValue, timezone);
+  const endedAt = Number.isNaN(parsedEnd) ? now : parsedEnd;
+  const elapsedMs = Math.max(0, endedAt - startedAt);
   const hours = elapsedMs / HOUR_MS;
   const reached = hours >= targetHours;
   const elapsed = formatDurationShort(elapsedMs);
@@ -369,11 +392,36 @@ function ConfirmStopModal({
                 target: targetHours
               })}
         </p>
+        <Field label={t('timer.confirmEnd.endAt')}>
+          <input
+            type="datetime-local"
+            value={endValue ?? epochToLocalInput(now, timezone)}
+            onChange={(e) => {
+              setEndValue(e.target.value);
+              setError(null);
+            }}
+            className="w-full h-12 px-3 rounded-xl border border-line bg-surface text-ink"
+          />
+        </Field>
+        {error && (
+          <p className="text-sm text-[rgb(255,107,107)]">{error}</p>
+        )}
         <div className="flex gap-2 justify-end">
           <Button variant="ghost" onClick={onClose}>
             {t('timer.confirmEnd.keep')}
           </Button>
-          <Button variant="danger" onClick={onConfirm}>
+          <Button
+            variant="danger"
+            onClick={() => {
+              if (endValue === null) return onConfirm(Date.now());
+              if (Number.isNaN(parsedEnd)) return setError(t('timeEdit.invalid'));
+              if (parsedEnd <= startedAt)
+                return setError(t('timeEdit.beforeMin'));
+              if (parsedEnd > Date.now())
+                return setError(t('timeEdit.afterMax'));
+              onConfirm(parsedEnd);
+            }}
+          >
             {t('timer.endFast')}
           </Button>
         </div>
