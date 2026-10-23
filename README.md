@@ -7,6 +7,10 @@ No backend at all, meaning 100% privacy as data never leaves your device.
 
 Live: https://asentahchiyski.github.io/fasting-timer/
 
+<img width="1080" height="2340" alt="Screenshot_20261023_162458_Brave" src="https://github.com/user-attachments/assets/6caaf0b7-6828-4fdc-87ea-a51267f6d0cc" />
+<img width="1080" height="2340" alt="Screenshot_20261023_162526_Brave" src="https://github.com/user-attachments/assets/0221ca18-2d4f-4d88-91f8-397b3a0e1a69" />
+<img width="1080" height="2340" alt="Screenshot_20261023_162613_Brave" src="https://github.com/user-attachments/assets/127955cb-b8a5-46f2-89eb-862722688df4" />
+
 ## Features
 
 - Start, end, or discard a fast; edit start and end times after the fact
