@@ -8,6 +8,7 @@ import {
   requestPersistentStorage
 } from './lib/backup';
 import { readDefaultBackupFile } from './lib/fileSync';
+import { initSync } from './lib/syncFile';
 import type { ExportPayload } from './db/types';
 import { applyAccent, applyThemeMode } from './theme/ThemeProvider';
 import './index.css';
@@ -37,6 +38,7 @@ async function bootstrap() {
   // Apply theme synchronously to avoid a flash on first paint.
   applyAccent(settings.accentColor);
   applyThemeMode(settings.themeMode);
+  void initSync();
 
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>

@@ -32,7 +32,8 @@ Mobile browsers can evict IndexedDB, so the app maintains redundant mirrors. Whe
 1. `src/main.tsx` `bootstrap()`: requests persistent storage, and if IndexedDB is empty, restores from the localStorage mirror or the OPFS backup file before rendering.
 2. `src/hooks/useAutoBackup.ts`: on every settings/sessions change (debounced 800ms) writes both mirrors.
 3. `src/lib/backup.ts`: localStorage mirror + manual export/import as a downloaded JSON file (`ExportPayload`, `version: 1` — bump and handle migration if the shape changes).
-4. `src/lib/fileSync.ts`: standing backup JSON file — a user-chosen file via the File System Access API (Chromium only, handle persisted in the `kv` table) with silent fallback to an OPFS file.
+4. `src/lib/fileSync.ts`: standing backup JSON file in OPFS (no permission needed).
+5. `src/lib/syncFile.ts`: optional two-way sync with a user-chosen JSON file (File System Access API, Chromium only; record + handle in the `kv` table under `syncFile`), so several devices share one data set. The file is an `ExportPayload`. Sync is three-way against `lastSynced`, last-write-wins when both sides changed; fasts are matched across devices by `startedAt`. Device-local settings (`onboarded`, timestamps) aren't synced — when adding a synced setting, add it to `SYNCED_SETTINGS`.
 
 ### Conventions
 

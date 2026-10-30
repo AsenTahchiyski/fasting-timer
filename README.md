@@ -17,6 +17,7 @@ Live: https://asentahchiyski.github.io/fasting-timer/
 - History with average and longest fast, goal streaks, and a chart of recent fasts
 - Confetti and a motivational message when you complete a fast
 - Custom accent color, light/dark theme, timezone, and 12/24-hour format
+- Optional sync between devices through a JSON file you choose
 - English and Bulgarian
 - Works offline
 
@@ -26,10 +27,31 @@ Everything is stored in the browser (IndexedDB). Mobile browsers can sometimes
 clear that storage, so the app keeps extra copies:
 
 - Asks the browser for persistent storage
-- Mirrors the data to localStorage and to a backup JSON file (a file you choose
-  in Chromium browsers, otherwise a private file in browser storage)
+- Mirrors the data to localStorage and to a private backup JSON file in browser
+  storage
 - Restores from those copies automatically if the main database is empty
 - Manual export/import as a JSON file from Settings, e.g. to move to another device
+
+### Sync file
+
+In Chromium desktop browsers (Chrome, Edge), Settings → Data → Sync file links
+the app to a JSON file you choose. Settings and all fasts are kept in that file
+and changes flow both ways, so several devices that link the same file share
+one data set. The app itself only reads and writes the local file; moving it
+between devices is up to a sync client you already run, such as Synology Drive,
+Google Drive, OneDrive, Dropbox or Syncthing. Data then leaves your device only
+through that client.
+
+- On the first device choose "Create new…" and save the file in the synced
+  folder; on the others choose "Open existing…" and pick the same file. Linking
+  an existing file merges its fasts with the ones already on the device.
+- The file is re-checked on every change, whenever the app comes back to the
+  foreground, and on "Sync now". If both sides changed since the last sync, the
+  newer one wins.
+- With Google Drive, prefer "Mirror files" mode (or mark the file "Available
+  offline"); with OneDrive, set the file to "Always keep on this device".
+- After a browser restart, tap "Allow access" once to resume syncing.
+- Mobile browsers can't link a file; use Export / Import there.
 
 ## Development
 

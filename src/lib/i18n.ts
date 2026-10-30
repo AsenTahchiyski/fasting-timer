@@ -178,19 +178,25 @@ const en: Dict = {
   'settings.toast.importedMerge': 'Imported (merged)',
   'settings.toast.importedReplace': 'Imported (replaced)',
   'settings.toast.cleared': 'History cleared',
-  'settings.toast.backupSet': 'Backup file updated',
-  'settings.toast.backupDefault': 'Using the default backup file',
-
-  // Backup file
-  'settings.backup.label': 'Backup file',
-  'settings.backup.defaultPath': 'App storage · {name}',
-  'settings.backup.hint':
-    'Kept up to date automatically on every change.',
-  'settings.backup.needsPermission':
-    'The browser needs permission to keep writing to this file. Until you allow it, backups go to the default file in app storage.',
-  'settings.backup.allow': 'Allow access',
-  'settings.backup.choose': 'Choose file…',
-  'settings.backup.useDefault': 'Use default',
+  // Sync file
+  'sync.title': 'Sync file',
+  'sync.hint':
+    'Keep settings and fasts in a JSON file you choose (e.g. in a synced folder) and link the same file on your other devices. Changes go both ways.',
+  'sync.create': 'Create new…',
+  'sync.open': 'Open existing…',
+  'sync.connected': 'connected',
+  'sync.syncedAt': 'synced {when}',
+  'sync.needsPermission': 'needs access again',
+  'sync.syncNow': 'Sync now',
+  'sync.reconnect': 'Allow access',
+  'sync.disconnect': 'Stop syncing',
+  'sync.unsupported':
+    'Live file sync needs a Chromium-based desktop browser (Chrome, Edge). Use Export / Import to move data by hand.',
+  'sync.invalidFile': "That file isn't Fasting Timer data.",
+  'sync.conflictFile':
+    'Both this device and the sync file changed; kept the newer file.',
+  'sync.conflictLocal':
+    "Both this device and the sync file changed; kept this device's newer copy.",
 
   // Timezone picker
   'tz.title': 'Timezone',
@@ -434,19 +440,25 @@ const bg: Dict = {
   'settings.toast.importedMerge': 'Импортирано (обединено)',
   'settings.toast.importedReplace': 'Импортирано (заменено)',
   'settings.toast.cleared': 'Историята е изчистена',
-  'settings.toast.backupSet': 'Резервният файл е обновен',
-  'settings.toast.backupDefault': 'Използва се файлът по подразбиране',
-
-  // Backup file
-  'settings.backup.label': 'Резервен файл',
-  'settings.backup.defaultPath': 'Хранилище на приложението · {name}',
-  'settings.backup.hint':
-    'Обновява се автоматично при всяка промяна.',
-  'settings.backup.needsPermission':
-    'Браузърът има нужда от разрешение, за да продължи да записва в този файл. Докато не го дадеш, копията отиват във файла по подразбиране в хранилището на приложението.',
-  'settings.backup.allow': 'Разреши достъп',
-  'settings.backup.choose': 'Избери файл…',
-  'settings.backup.useDefault': 'По подразбиране',
+  // Sync file
+  'sync.title': 'Файл за синхронизация',
+  'sync.hint':
+    'Пази настройките и гладуванията в JSON файл по твой избор (напр. в синхронизирана папка) и свържи същия файл на другите си устройства. Промените вървят и в двете посоки.',
+  'sync.create': 'Създай нов…',
+  'sync.open': 'Отвори съществуващ…',
+  'sync.connected': 'свързан',
+  'sync.syncedAt': 'синхронизиран {when}',
+  'sync.needsPermission': 'нужен е достъп отново',
+  'sync.syncNow': 'Синхронизирай сега',
+  'sync.reconnect': 'Разреши достъп',
+  'sync.disconnect': 'Спри синхронизацията',
+  'sync.unsupported':
+    'Синхронизацията с файл изисква настолен браузър на Chromium (Chrome, Edge). Използвай Експорт / Импорт, за да прехвърлиш данните ръчно.',
+  'sync.invalidFile': 'Този файл не съдържа данни на Fasting Timer.',
+  'sync.conflictFile':
+    'Промени и на устройството, и във файла; запазен е по-новият файл.',
+  'sync.conflictLocal':
+    'Промени и на устройството, и във файла; запазено е по-новото от устройството.',
 
   // Timezone picker
   'tz.title': 'Часова зона',
